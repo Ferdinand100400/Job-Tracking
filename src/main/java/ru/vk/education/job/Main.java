@@ -2,67 +2,90 @@ package ru.vk.education.job;
 
 import ru.vk.education.job.domain.Job;
 import ru.vk.education.job.domain.User;
-import ru.vk.education.job.service.JobService;
-import ru.vk.education.job.service.MatchOfUserToJobService;
-import ru.vk.education.job.service.ServiceLink;
-import ru.vk.education.job.service.UserService;
+import ru.vk.education.job.service.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         ServiceLink serviceLink = new ServiceLink();
         MatchOfUserToJobService matchOfUserToJobService = serviceLink.getMatchOfUserToJobService();
         JobService jobService = serviceLink.getJobService();
         UserService userService = serviceLink.getUserService();
+        FileService fileService = new FileService("log.txt");
 
-        while (true) {
-            if (scanner.hasNext()) {
-                String command = scanner.next();
-                switch (command) {
-                    case "user":
-                        User user = parsingAddUser(scanner);
-                        if (user != null)
-                            userService.addUser(user);
-                        break;
-                    case "user-list":
-                        System.out.println(userService);
-                        break;
-                    case "job":
-                        Job job = parsingAddJob(scanner);
-                        if (job != null)
-                            jobService.addJob(job);
-                        break;
-                    case "job-list":
-                        System.out.println(jobService);
-                        break;
-                    case "suggest":
-                        if (scanner.hasNext()) {
-                            User u = userService.getUserByName(scanner.next());
-                            if (u != null) {
-                                List<Job> jobs = matchOfUserToJobService.getTwoJobForUser(u);
-                                for (Job j : jobs)
-                                    System.out.println(j);
-                            }
-                        }
-                        break;
-                }
-                if (command.equals("exit")) break;
+
+        // Выполнение команд из файла при старте приложения
+        try (BufferedReader reader = fileService.getAllCommandsFromFile()) {
+            while (reader.ready()) {
+                String[] inputCommand = reader.readLine().split(" ");
+                String command = inputCommand[0];
+                if (command.equals("user") || command.equals("job"))
+                    executionCommand(inputCommand, command, userService, jobService, matchOfUserToJobService, fileService);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        scanner.close();
+
+        // Выполнение последовательно команд из консоли пока не будет введено exit
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in))) {
+            while (true) {
+                String[] inputLine = bufferedReader.readLine().split(" ");
+                String command = inputLine[0];
+                executionCommand(inputLine, command, userService, jobService, matchOfUserToJobService, fileService);
+                if (command.equals("exit")) break;
+                fileService.saveCommandInFile(inputLine);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private static User parsingAddUser(Scanner scanner) {
+    private static void executionCommand(String[] inputLine, String command, UserService userService, JobService jobService, MatchOfUserToJobService matchOfUserToJobService, FileService fileService) throws IOException {
+        switch (command) {
+            case "user":
+                User user = parsingAddUser(inputLine);
+                if (user != null)
+                    userService.addUser(user);
+                break;
+            case "user-list":
+                System.out.println(userService);
+                break;
+            case "job":
+                Job job = parsingAddJob(inputLine);
+                if (job != null)
+                    jobService.addJob(job);
+                break;
+            case "job-list":
+                System.out.println(jobService);
+                break;
+            case "suggest":
+                User u = userService.getUserByName(inputLine[1]);
+                if (u != null) {
+                    List<Job> jobs = matchOfUserToJobService.getTwoJobForUser(u);
+                    for (Job j : jobs)
+                        System.out.println(j);
+                }
+                break;
+            case "history":
+                System.out.println(fileService.getAllCommandsFromFile().lines().collect(Collectors.joining("\n")));
+                break;
+        }
+    }
+
+    private static User parsingAddUser(String[] inputLine) {
         String name;
         int experience;
-        if (!scanner.hasNext()) return null;
-        name = scanner.next();
+        if (inputLine.length < 2) return null;
+        name = inputLine[1];
 
         List<String[]> params = new ArrayList<>();
-        params.add(splitParam(scanner));
-        params.add(splitParam(scanner));
+        params.add(splitParam(inputLine[2]));
+        params.add(splitParam(inputLine[3]));
         String[] param1 = searchParam(params, "--skills");
         if (param1 == null) return null;
         String[] param2 = searchParam(params, "--exp");
@@ -74,16 +97,16 @@ public class Main {
         return new User(name, skills, experience);
     }
 
-    private static Job parsingAddJob(Scanner scanner) {
+    private static Job parsingAddJob(String[] inputLine) {
         String name;
 
-        if (!scanner.hasNext()) return null;
-        name = scanner.next();
+        if (inputLine.length < 2) return null;
+        name = inputLine[1];
 
         List<String[]> params = new ArrayList<>();
-        params.add(splitParam(scanner));
-        params.add(splitParam(scanner));
-        params.add(splitParam(scanner));
+        params.add(splitParam(inputLine[2]));
+        params.add(splitParam(inputLine[3]));
+        params.add(splitParam(inputLine[4]));
         String[] param1 = searchParam(params, "--company");
         if (param1 == null) return null;
         String[] param2 = searchParam(params, "--tags");
@@ -105,9 +128,8 @@ public class Main {
                 .orElse(null);
     }
 
-    private static String[] splitParam(Scanner scanner) {
-        if (!scanner.hasNext()) return null;
-        String param = scanner.next();
+    private static String[] splitParam(String param) {
+        if (param.isEmpty()) return null;
         return param.split("=");
     }
 }
