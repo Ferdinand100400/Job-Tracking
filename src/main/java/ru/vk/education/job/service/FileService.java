@@ -1,5 +1,7 @@
 package ru.vk.education.job.service;
 
+import ru.vk.education.job.controller.InputCommand;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -23,11 +25,14 @@ public class FileService {
         }
     }
 
-    public void saveCommandInFile(String[] wordsLine) {
+    public void saveCommandInFile(InputCommand wordsLine) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(externalPath + nameFile, StandardCharsets.UTF_8, true))) {
-            for (int i = 0; i < wordsLine.length; i++) {
-                writer.write(wordsLine[i]);
-                if (i != wordsLine.length - 1) writer.write(" ");
+            writer.write(wordsLine.command());
+            writer.write(" ");
+            String[] params = wordsLine.params();
+            for (int i = 0; i < params.length; i++) {
+                writer.write(params[i]);
+                if (i != params.length - 1) writer.write(" ");
             }
             writer.newLine();
         } catch (IOException e) {
