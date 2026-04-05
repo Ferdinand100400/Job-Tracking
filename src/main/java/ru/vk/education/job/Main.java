@@ -25,7 +25,8 @@ public class Main {
                 new AddJobCmd(jobService),
                 new JobListCmd(jobService),
                 new SuggestCmd(userService, matchOfUserToJobService),
-                new HistoryCmd(fileService)
+                new HistoryCmd(fileService),
+                new StatisticsCmd(jobService, userService, matchOfUserToJobService)
         ));
 
         LoggedCommandHandler loggedCommandHandler = new LoggedCommandHandler(commandHandler, fileService);

@@ -5,15 +5,21 @@ public class  MatchOfUserToJob {
     private final Job job;
     private final double countMatch;
 
-    public MatchOfUserToJob(User user, Job job) {
+    public MatchOfUserToJob(User user, Job job) throws IllegalArgumentException {
+        double countMatch = calculateMatch(user, job);
+        if (countMatch == 0) throw new IllegalArgumentException("");
+        this.countMatch = countMatch;
         this.user = user;
         this.job = job;
-        this.countMatch = calculateMatch(user, job);
     }
 
     public Job getJobIfUserOrNull(User user) {
         if (this.user.equals(user)) return job;
         return null;
+    }
+
+    public User user() {
+        return user;
     }
 
     // Расчет соответствия пользователя вакансии

@@ -20,9 +20,18 @@ public class Job {
         return user.isCheckExperienceToJob(experience);
     }
 
+    // Если пользователю по опыту подходит вакансия, то true
+    public boolean isCheckExperienceLeastN(int n) {
+        return experience >= n;
+    }
+
     // Проверка имя работы совпадает ли с именем переданной работы
     public boolean isJobExists(Job job) {
         return name.equals(job.name);
+    }
+
+    public String name() {
+        return name;
     }
 
     public Set<String> tags() {

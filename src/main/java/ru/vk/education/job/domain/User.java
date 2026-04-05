@@ -27,6 +27,10 @@ public class User {
         return name.equals(userName);
     }
 
+    public String name() {
+        return name;
+    }
+
     public Set<String> skills() {
         return skills;
     }
