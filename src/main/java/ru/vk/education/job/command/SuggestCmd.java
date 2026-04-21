@@ -26,7 +26,7 @@ public class SuggestCmd implements Command {
     public void execute(String[] params) {
         User u = userService.getUserByName(params[0]);
         if (u != null) {
-            List<Job> jobs = matchOfUserToJobService.getTwoJobForUser(u);
+            List<Job> jobs = matchOfUserToJobService.getJobsForUser(u, 2);
             for (Job j : jobs)
                 System.out.println(j);
         }

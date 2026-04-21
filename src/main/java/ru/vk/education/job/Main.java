@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,6 +19,10 @@ public class Main {
         JobService jobService = serviceLink.getJobService();
         UserService userService = serviceLink.getUserService();
         FileService fileService = new FileService("log.txt");
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        SchedulerService task = new SchedulerService(userService, matchOfUserToJobService);
+        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.MINUTES);
 
         CommandHandler commandHandler = new CommandHandler(List.of(
                 new AddUserCmd(userService),
@@ -54,5 +59,21 @@ public class Main {
             e.printStackTrace();
         }
 
+
+        // Закрытие потока
+        //   Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(1, TimeUnit.MINUTES)) {
+                scheduler.shutdownNow();
+                scheduler.awaitTermination(10, TimeUnit.SECONDS);
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+
+            //    }));
+
+        }
     }
 }

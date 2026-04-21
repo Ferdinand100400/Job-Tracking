@@ -39,18 +39,26 @@ public class  MatchOfUserToJobService {
         }
     }
 
-    // Получение 2х вакансий подходящие пользователю
-    public List<Job> getTwoJobForUser(User user) {
+    // Получение countJobs вакансий подходящие пользователю в порядке убывания метча
+    public List<Job> getJobsForUser(User user, int countJobs) {
         List<Job> jobs = new ArrayList<>();
         int limit = 0;
         for (MatchOfUserToJob matchOfUserToJob : sortedMatchesOfUserToJob(matchesOfUserToJob)) {
             Job job = matchOfUserToJob.getJobIfUserOrNull(user);
-            if (job != null && limit < 2) {
+            if (job != null && limit < countJobs) {
                 jobs.add(job);
                 limit++;
             }
         }
         return jobs;
+    }
+
+    public Job getBestJobForUser(User user) {
+        try {
+            return getJobsForUser(user, 1).get(0);
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("");
+        }
     }
 
     // Получение списка пользователей у которых есть не менее чем N мэтчей
