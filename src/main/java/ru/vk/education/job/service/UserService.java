@@ -1,10 +1,14 @@
 package ru.vk.education.job.service;
 
+import org.springframework.stereotype.Service;
 import ru.vk.education.job.domain.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+@Service
 public class UserService {
     private final List<User> users;
     private final ServiceLink serviceLink;
@@ -19,7 +23,7 @@ public class UserService {
         for (User u : users) {
             if (u.isUserExists(user)) return;
         }
-        serviceLink.matchOfUserToJobService.addMatch(user, serviceLink.getListJobs());
+        serviceLink.getMatchOfUserToJobService().addMatch(user, serviceLink.getListJobs());
         users.add(user);
     }
 
@@ -32,6 +36,19 @@ public class UserService {
             if (user.isUserExists(name)) return user;
         }
         return null;
+    }
+
+    // Топ N скиллов среди всех пользователей (скиллы, которые чаще всего встречаются)
+    public List<String> topNSkills(int n) {
+        return users.stream()
+                .flatMap(user -> user.skills().stream())
+                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(n)
+                .map(Map.Entry::getKey)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     @Override

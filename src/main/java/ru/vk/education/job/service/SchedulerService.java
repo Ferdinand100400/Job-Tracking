@@ -1,26 +1,26 @@
 package ru.vk.education.job.service;
 
+import org.springframework.stereotype.Service;
 import ru.vk.education.job.domain.User;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 public class SchedulerService implements Runnable {
 
-    private final UserService userService;
-    private final MatchOfUserToJobService matchOfUserToJobService;
+    private final ServiceLink serviceLink;
 
-    public SchedulerService(UserService userService, MatchOfUserToJobService matchOfUserToJobService) {
-        this.userService = userService;
-        this.matchOfUserToJobService = matchOfUserToJobService;
+    public SchedulerService(ServiceLink serviceLink) {
+        this.serviceLink = serviceLink;
     }
 
     @Override
     public void run() {
         Map<String, String> bestOfferForUsers = new HashMap<>();
-        for (User user : userService.getListUsers()) {
+        for (User user : serviceLink.getUserService().getListUsers()) {
             try {
-                bestOfferForUsers.put(user.name(), matchOfUserToJobService.getBestJobForUser(user).toString());
+                bestOfferForUsers.put(user.name(), serviceLink.getMatchOfUserToJobService().getBestJobForUser(user).toString());
             }
             catch (IllegalArgumentException e) {
                 bestOfferForUsers.put(user.name(), "нет подходящего предложения");

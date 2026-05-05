@@ -1,5 +1,7 @@
 package ru.vk.education.job.service;
 
+import lombok.Getter;
+import org.springframework.stereotype.Service;
 import ru.vk.education.job.domain.Job;
 import ru.vk.education.job.domain.MatchOfUserToJob;
 import ru.vk.education.job.domain.User;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Service
 public class  MatchOfUserToJobService {
     private final List<MatchOfUserToJob> matchesOfUserToJob;
 

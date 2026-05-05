@@ -1,14 +1,16 @@
 package ru.vk.education.job.service;
 
+import org.springframework.stereotype.Service;
 import ru.vk.education.job.domain.Job;
 import ru.vk.education.job.domain.User;
 
 import java.util.List;
 
+@Service
 public class ServiceLink {
-    UserService userService;
-    JobService jobService;
-    MatchOfUserToJobService matchOfUserToJobService;
+    private final UserService userService;
+    private final JobService jobService;
+    private final MatchOfUserToJobService matchOfUserToJobService;
 
     public ServiceLink() {
         userService = new UserService(this);

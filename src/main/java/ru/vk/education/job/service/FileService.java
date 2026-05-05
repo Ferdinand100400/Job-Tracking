@@ -1,6 +1,8 @@
 package ru.vk.education.job.service;
 
-import ru.vk.education.job.controller.InputCommand;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ru.vk.education.job.commandLineInterface.command.controller.InputCommand;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -8,12 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Service
 public class FileService {
-    private final String nameFile;
+    private final String nameFile = "log.txt";
     private final String externalPath;
 
-    public FileService(String nameFile) {
-        this.nameFile = nameFile;
+    public FileService() {
         externalPath = System.getProperty("user.home") + File.separator + ".myapp" + File.separator;
         try {
             Files.createDirectories(Paths.get(externalPath));

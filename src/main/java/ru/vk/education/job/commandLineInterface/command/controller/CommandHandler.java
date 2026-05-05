@@ -1,6 +1,6 @@
-package ru.vk.education.job.controller;
+package ru.vk.education.job.commandLineInterface.command.controller;
 
-import ru.vk.education.job.command.Command;
+import ru.vk.education.job.commandLineInterface.command.Command;
 
 import java.util.List;
 import java.util.Map;

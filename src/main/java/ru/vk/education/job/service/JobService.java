@@ -1,5 +1,6 @@
 package ru.vk.education.job.service;
 
+import org.springframework.stereotype.Service;
 import ru.vk.education.job.domain.Job;
 
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class JobService {
     private final List<Job> jobs;
     private final ServiceLink serviceLink;
@@ -21,7 +23,7 @@ public class JobService {
         for (Job j : jobs) {
             if (j.isJobExists(job)) return;
         }
-        serviceLink.matchOfUserToJobService.addMatch(serviceLink.getListUsers(), job);
+        serviceLink.getMatchOfUserToJobService().addMatch(serviceLink.getListUsers(), job);
         jobs.add(job);
     }
 

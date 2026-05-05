@@ -1,11 +1,18 @@
 package ru.vk.education.job.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class  MatchOfUserToJob {
+    @JsonProperty
     private final User user;
+    @JsonProperty
     private final Job job;
+    @JsonProperty
     private final double countMatch;
 
-    public MatchOfUserToJob(User user, Job job) throws IllegalArgumentException {
+    @JsonCreator
+    public MatchOfUserToJob(@JsonProperty("user") User user, @JsonProperty("job") Job job) throws IllegalArgumentException {
         double countMatch = calculateMatch(user, job);
         if (countMatch == 0) throw new IllegalArgumentException("");
         this.countMatch = countMatch;
@@ -34,5 +41,14 @@ public class  MatchOfUserToJob {
 
     public double getCountMatch() {
         return countMatch;
+    }
+
+    @Override
+    public String toString() {
+        return "MatchOfUserToJob{" +
+                "user=" + user +
+                ", job=" + job +
+                ", countMatch=" + countMatch +
+                '}';
     }
 }

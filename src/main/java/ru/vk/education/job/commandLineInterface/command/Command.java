@@ -1,4 +1,4 @@
-package ru.vk.education.job.command;
+package ru.vk.education.job.commandLineInterface.command;
 
 import java.util.List;
 

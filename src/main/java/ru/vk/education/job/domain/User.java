@@ -1,13 +1,22 @@
 package ru.vk.education.job.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Set;
 
+
 public class User {
+    @JsonProperty
     private final String name;
+    @JsonProperty
     private final Set<String> skills;
+    @JsonProperty
     private final Integer experience;
 
-    public User(String name, Set<String> skills, Integer experience) {
+
+    @JsonCreator
+    public User(@JsonProperty("name") String name, @JsonProperty("skills") Set<String> skills, @JsonProperty("experience") Integer experience) {
         this.name = name;
         this.skills = skills;
         this.experience = experience;

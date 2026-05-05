@@ -1,4 +1,4 @@
-package ru.vk.education.job.controller;
+package ru.vk.education.job.commandLineInterface.command.controller;
 
 import ru.vk.education.job.service.FileService;
 

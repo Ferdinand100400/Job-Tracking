@@ -1,4 +1,4 @@
-package ru.vk.education.job.command;
+package ru.vk.education.job.commandLineInterface.command;
 
 import ru.vk.education.job.domain.User;
 import ru.vk.education.job.service.JobService;
@@ -33,19 +33,6 @@ public class StatisticsCmd implements Command {
         if (params[0].equals("--match"))
             matchOfUserToJobService.getListUserWithLeastNMatches(Integer.parseInt(params[1])).forEach(System.out::println);
         if (params[0].equals("--top-skills"))
-            topNSkills(userService.getListUsers(), Integer.parseInt(params[1])).forEach(System.out::println);
-    }
-
-    // Топ N скиллов среди всех пользователей (скиллы, которые чаще всего встречаются)
-    private List<String> topNSkills(List<User> users, int n) {
-        return users.stream()
-                .flatMap(user -> user.skills().stream())
-                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()))
-                .entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .limit(n)
-                .map(Map.Entry::getKey)
-                .sorted()
-                .collect(Collectors.toList());
+            userService.topNSkills(Integer.parseInt(params[1])).forEach(System.out::println);
     }
 }
