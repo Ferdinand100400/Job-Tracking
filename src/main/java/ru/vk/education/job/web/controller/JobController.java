@@ -1,8 +1,8 @@
 package ru.vk.education.job.web.controller;
 
 import org.springframework.web.bind.annotation.*;
-import ru.vk.education.job.domain.Job;
 import ru.vk.education.job.service.ServiceLink;
+import ru.vk.education.job.web.dto.JobDto;
 
 import java.util.List;
 
@@ -17,13 +17,13 @@ public class JobController {
     }
 
     @PostMapping
-    public void addJob(@RequestBody Job job) {
-        System.out.println("add job: " + job);
-        serviceLink.getJobService().addJob(job);
+    public void addJob(@RequestBody JobDto jobDto) {
+        System.out.println("add job: " + jobDto);
+        serviceLink.getJobService().addJob(jobDto);
     }
 
     @GetMapping
-    public List<Job> getListJobs() {
+    public List<JobDto> getListJobs() {
         System.out.println(serviceLink.getJobService());
         return serviceLink.getJobService().getListJobs();
     }

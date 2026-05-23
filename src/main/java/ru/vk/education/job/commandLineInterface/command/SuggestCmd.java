@@ -1,9 +1,9 @@
 package ru.vk.education.job.commandLineInterface.command;
 
-import ru.vk.education.job.domain.Job;
-import ru.vk.education.job.domain.User;
 import ru.vk.education.job.service.MatchOfUserToJobService;
 import ru.vk.education.job.service.UserService;
+import ru.vk.education.job.web.dto.JobDto;
+import ru.vk.education.job.web.dto.UserDto;
 
 import java.util.List;
 
@@ -24,10 +24,10 @@ public class SuggestCmd implements Command {
 
     @Override
     public void execute(String[] params) {
-        User u = userService.getUserByName(params[0]);
+        UserDto u = userService.getUserByName(params[0]);
         if (u != null) {
-            List<Job> jobs = matchOfUserToJobService.getJobsForUser(u, 2);
-            for (Job j : jobs)
+            List<JobDto> jobs = matchOfUserToJobService.getJobsForUser(u, 2);
+            for (JobDto j : jobs)
                 System.out.println(j);
         }
     }

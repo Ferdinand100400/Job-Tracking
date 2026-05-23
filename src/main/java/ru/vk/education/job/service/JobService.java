@@ -1,49 +1,55 @@
 package ru.vk.education.job.service;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.vk.education.job.domain.Job;
+import ru.vk.education.job.mapper.JobMapper;
+import ru.vk.education.job.repository.JobRepository;
+import ru.vk.education.job.web.dto.JobDto;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class JobService {
-    private final List<Job> jobs;
-    private final ServiceLink serviceLink;
-    
-    public JobService(ServiceLink serviceLink) {
-        jobs = new ArrayList<>();
+    private final JobRepository jobRepo;
+     private final ServiceLink serviceLink;
+
+    public JobService(JobRepository jobRepo, ServiceLink serviceLink) {
+        this.jobRepo = jobRepo;
         this.serviceLink = serviceLink;
     }
 
-    public void addJob(Job job) {
-        if (job == null) return;
-        for (Job j : jobs) {
-            if (j.isJobExists(job)) return;
+    public void addJob(JobDto jobDto) {
+        if (jobDto == null) return;
+        try {
+            jobRepo.findJobByName(jobDto.name());
+        } catch (EmptyResultDataAccessException e) {
+            jobRepo.save(JobMapper.dtoToDomain(jobDto));
+            serviceLink.getMatchOfUserToJobService().addMatch(serviceLink.getListUsers(), jobDto);
         }
-        serviceLink.getMatchOfUserToJobService().addMatch(serviceLink.getListUsers(), job);
-        jobs.add(job);
     }
 
-    public List<Job> getListJobs() {
-        return jobs.stream()
-                .sorted(Comparator.comparing(Job::name))
+    public List<JobDto> getListJobs() {
+        return jobRepo.findJobs().stream()
+                .map(JobMapper::domainToDto)
+                .sorted(Comparator.comparing(JobDto::name))
                 .collect(Collectors.toList());
     }
 
     // Получение списка вакансий с опытом не менее указанного (n)
-    public List<Job> getListJobsWithExpLeastOfN(int n) {
-        return jobs.stream()
+    public List<JobDto> getListJobsWithExpLeastOfN(int n) {
+        return jobRepo.findJobs().stream()
+                .map(JobMapper::domainToDto)
                 .filter(j -> j.isCheckExperienceLeastN(n))
-                .sorted(Comparator.comparing(Job::name))
+                .sorted(Comparator.comparing(JobDto::name))
                 .collect(Collectors.toList());
     }
 
     @Override
     public String toString() {
-        List<Job> jobs = getListJobs();
+        List<JobDto> jobs = getListJobs();
         String res = "";
         for (int i = 0; i < jobs.size(); i++) {
             res = res.concat(jobs.get(i).toString());

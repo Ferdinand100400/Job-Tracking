@@ -1,9 +1,9 @@
 package ru.vk.education.job.web.controller;
 
 import org.springframework.web.bind.annotation.*;
-import ru.vk.education.job.domain.Job;
-import ru.vk.education.job.domain.User;
 import ru.vk.education.job.service.ServiceLink;
+import ru.vk.education.job.web.dto.JobDto;
+import ru.vk.education.job.web.dto.UserDto;
 
 import java.util.List;
 
@@ -18,8 +18,8 @@ public class SuggestController {
     }
 
     @GetMapping
-    public List<Job> getTwoJobsMatchedForUser(@RequestParam("name") String userName) {
-        User user = serviceLink.getUserService().getUserByName(userName);
+    public List<JobDto> getTwoJobsMatchedForUser(@RequestParam("name") String userName) {
+        UserDto user = serviceLink.getUserService().getUserByName(userName);
         System.out.println("2 вакансии подходящие пользователю " + userName + ": "
                 + serviceLink.getMatchOfUserToJobService().getJobsForUser(user, 2));
         return serviceLink.getMatchOfUserToJobService().getJobsForUser(user, 2);

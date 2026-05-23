@@ -1,7 +1,7 @@
 package ru.vk.education.job.service;
 
 import org.springframework.stereotype.Service;
-import ru.vk.education.job.domain.User;
+import ru.vk.education.job.web.dto.UserDto;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class SchedulerService implements Runnable {
     @Override
     public void run() {
         Map<String, String> bestOfferForUsers = new HashMap<>();
-        for (User user : serviceLink.getUserService().getListUsers()) {
+        for (UserDto user : serviceLink.getUserService().getListUsers()) {
             try {
                 bestOfferForUsers.put(user.name(), serviceLink.getMatchOfUserToJobService().getBestJobForUser(user).toString());
             }

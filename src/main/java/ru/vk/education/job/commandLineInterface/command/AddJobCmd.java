@@ -1,7 +1,7 @@
 package ru.vk.education.job.commandLineInterface.command;
 
-import ru.vk.education.job.domain.Job;
 import ru.vk.education.job.service.JobService;
+import ru.vk.education.job.web.dto.JobDto;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class AddJobCmd implements Command {
 
     @Override
     public void execute(String[] params) {
-        jobService.addJob(new Job(name(params), company(params), tags(params), experience(params)));
+        jobService.addJob(new JobDto(name(params), company(params), tags(params), experience(params)));
     }
 
     private String name(String[] params) {

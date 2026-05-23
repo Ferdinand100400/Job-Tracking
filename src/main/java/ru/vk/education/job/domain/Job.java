@@ -1,53 +1,47 @@
 package ru.vk.education.job.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Set;
 
 public class Job {
-    @JsonProperty
+    private Long id;
     private final String name;
-    @JsonProperty
     private final String company;
-    @JsonProperty
     private final Set<String> tags;
-    @JsonProperty
     private final Integer experience;
 
-    @JsonCreator
-    public Job(@JsonProperty("name") String name, @JsonProperty("company") String company, @JsonProperty("tags") Set<String> tags, @JsonProperty("experience") Integer experience) {
+    public Job(Long id, String name, String company, Set<String> tags, Integer experience) {
+        this.id = id;
         this.name = name;
         this.company = company;
         this.tags = tags;
         this.experience = experience;
     }
 
-    // Если пользователю по опыту подходит вакансия, то true
-    public boolean isCheckExperienceToUser(User user) {
-        return user.isCheckExperienceToJob(experience);
-    }
-
-    // Если пользователю по опыту подходит вакансия, то true
-    public boolean isCheckExperienceLeastN(int n) {
-        return experience >= n;
-    }
-
-    // Проверка имя работы совпадает ли с именем переданной работы
-    public boolean isJobExists(Job job) {
-        return name.equals(job.name);
+    public Job(String name, String company, Set<String> tags, Integer experience) {
+        this(0L, name, company, tags, experience);
     }
 
     public String name() {
         return name;
     }
 
+    public String company() {
+        return company;
+    }
+
+    public Integer experience() {
+        return experience;
+    }
+
     public Set<String> tags() {
         return tags;
     }
 
-    @Override
-    public String toString() {
-        return name + " at " + company;
+    public Long id() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

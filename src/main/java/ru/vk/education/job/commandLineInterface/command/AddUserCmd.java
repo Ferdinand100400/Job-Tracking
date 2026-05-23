@@ -1,7 +1,7 @@
 package ru.vk.education.job.commandLineInterface.command;
 
-import ru.vk.education.job.domain.User;
 import ru.vk.education.job.service.UserService;
+import ru.vk.education.job.web.dto.UserDto;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class AddUserCmd implements Command {
 
     @Override
     public void execute(String[] params) {
-        userService.addUser(new User(name(params), skills(params), experience(params)));
+        userService.addUser(new UserDto(name(params), skills(params), experience(params)));
     }
 
     private String name(String[] params) {

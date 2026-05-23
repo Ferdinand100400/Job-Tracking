@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-//	id 'org.springframework.boot' version '4.0.3'
-//	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.boot' version '3.1.12'
+	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'ru.vk.education'
@@ -25,9 +25,10 @@ repositories {
 }
 
 dependencies {
-//	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation("org.springframework.boot:spring-boot-starter-web:4.0.5")
+	implementation ("org.springframework.boot:spring-boot-starter-jdbc")
+	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.projectlombok:lombok:1.18.42")
+	runtimeOnly 'org.postgresql:postgresql'
 //	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.0.3'
 }

@@ -1,10 +1,11 @@
 package ru.vk.education.job.service;
 
-import lombok.Getter;
 import org.springframework.stereotype.Service;
-import ru.vk.education.job.domain.Job;
-import ru.vk.education.job.domain.MatchOfUserToJob;
-import ru.vk.education.job.domain.User;
+import ru.vk.education.job.mapper.MatchOfUserToJobMapper;
+import ru.vk.education.job.repository.MatchOfUserToJobRepository;
+import ru.vk.education.job.web.dto.JobDto;
+import ru.vk.education.job.web.dto.MatchOfUserToJobDto;
+import ru.vk.education.job.web.dto.UserDto;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,17 +15,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class  MatchOfUserToJobService {
-    private final List<MatchOfUserToJob> matchesOfUserToJob;
+    private final MatchOfUserToJobRepository matchesOfUserToJobRepo;
 
-    public MatchOfUserToJobService() {
-        matchesOfUserToJob = new ArrayList<>();
+    public MatchOfUserToJobService(MatchOfUserToJobRepository matchesOfUserToJobRepo) {
+        this.matchesOfUserToJobRepo = matchesOfUserToJobRepo;
     }
 
     // Добавление новых соответствий в результате добавления нового пользователя
-    public void addMatch(User newUser, List<Job> jobs) {
-        for (Job job : jobs) {
+    public void addMatch(UserDto newUser, List<JobDto> jobs) {
+        for (JobDto job : jobs) {
             try {
-                matchesOfUserToJob.add(new MatchOfUserToJob(newUser, job));
+                matchesOfUserToJobRepo.save(MatchOfUserToJobMapper.dtoToDomain(new MatchOfUserToJobDto(newUser, job)));
             } catch (IllegalArgumentException e) {
                 return;
             }
@@ -32,10 +33,10 @@ public class  MatchOfUserToJobService {
     }
 
     // Добавление новых соответствий в результате добавления новой работы
-    public void addMatch(List<User> users, Job newJob) {
-        for (User user : users) {
+    public void addMatch(List<UserDto> users, JobDto newJob) {
+        for (UserDto user : users) {
             try {
-                matchesOfUserToJob.add(new MatchOfUserToJob(user, newJob));
+                matchesOfUserToJobRepo.save(MatchOfUserToJobMapper.dtoToDomain(new MatchOfUserToJobDto(user, newJob)));
             } catch (IllegalArgumentException e) {
                 return;
             }
@@ -43,42 +44,43 @@ public class  MatchOfUserToJobService {
     }
 
     // Получение countJobs вакансий подходящие пользователю в порядке убывания метча
-    public List<Job> getJobsForUser(User user, int countJobs) {
-        List<Job> jobs = new ArrayList<>();
+    public List<JobDto> getJobsForUser(UserDto userDto, int countJobs) {
+        List<JobDto> jobs = new ArrayList<>();
         int limit = 0;
-        for (MatchOfUserToJob matchOfUserToJob : sortedMatchesOfUserToJob(matchesOfUserToJob)) {
-            Job job = matchOfUserToJob.getJobIfUserOrNull(user);
-            if (job != null && limit < countJobs) {
-                jobs.add(job);
+        for (MatchOfUserToJobDto matchOfUserToJobDto : sortedMatchesOfUserToJob(MatchOfUserToJobMapper.domainListToDtoList(matchesOfUserToJobRepo.findAllMatchOfUserToJob()))) {
+            JobDto jobDto = matchOfUserToJobDto.getJobIfUserOrNull(userDto);
+            if (jobDto != null && limit < countJobs) {
+                jobs.add(jobDto);
                 limit++;
             }
         }
         return jobs;
     }
 
-    public Job getBestJobForUser(User user) {
+    public JobDto getBestJobForUser(UserDto userDto) {
         try {
-            return getJobsForUser(user, 1).get(0);
+            return getJobsForUser(userDto, 1).get(0);
         } catch (IndexOutOfBoundsException e) {
             throw new IllegalArgumentException("");
         }
     }
 
     // Получение списка пользователей у которых есть не менее чем N мэтчей
-    public List<User> getListUserWithLeastNMatches(int n) {
+    public List<UserDto> getListUserWithLeastNMatches(int n) {
+        List<MatchOfUserToJobDto> matchesOfUserToJob = MatchOfUserToJobMapper.domainListToDtoList(matchesOfUserToJobRepo.findAllMatchOfUserToJob());
         return matchesOfUserToJob.stream()
-                .collect(Collectors.groupingBy(MatchOfUserToJob::user, Collectors.counting()))
+                .collect(Collectors.groupingBy(MatchOfUserToJobDto::userDto, Collectors.counting()))
                 .entrySet().stream()
                 .filter(countMatch -> countMatch.getValue() >= n)
                 .map(Map.Entry::getKey)
-                .sorted(Comparator.comparing(User::name))
+                .sorted(Comparator.comparing(UserDto::name))
                 .collect(Collectors.toList());
     }
 
     // Отсортированный список по убыванию величины совпадения
-    private List<MatchOfUserToJob> sortedMatchesOfUserToJob(List<MatchOfUserToJob> matchesOfUserToJob) {
-        return matchesOfUserToJob.stream()
-                .sorted(Comparator.comparing(MatchOfUserToJob::getCountMatch).reversed())
+    private List<MatchOfUserToJobDto> sortedMatchesOfUserToJob(List<MatchOfUserToJobDto> matchesOfUserToJobDto) {
+        return matchesOfUserToJobDto.stream()
+                .sorted(Comparator.comparing(MatchOfUserToJobDto::countMatch).reversed())
                 .collect(Collectors.toList());
     }
 }
